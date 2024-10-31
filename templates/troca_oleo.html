@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block content %}
+<hr>
+<br>
+<!-- Botão para abrir o modal de troca de óleo -->
+<button id="btnLancarTroca" class="button">+ Lançar Troca de Óleo</button>
+
+<!-- Modal de cadastro e edição de troca de óleo -->
+<div id="modal-troca-oleo" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modalTitle">Lançar Troca de Óleo</h3>
+        </div>
+        <div class="modal-body">
+            <form id="trocaForm" method="post">
+                <input type="hidden" id="troca_id" name="troca_id">
+                <div class="form-group">
+                    <label for="data">Data</label>
+                    <input type="date" id="data" name="data">
+                </div>
+                <div class="form-group">
+                    <label for="cliente">Cliente</label>
+                    <select id="cliente_id" name="cliente_id">
+                        <option value="" disabled selected>Selecionar um cliente</option>
+                        {% for cliente in clientes %}
+                            <option value="{{ cliente[0] }}">{{ cliente[1] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>                
+                <div class="form-group">
+                    <label for="quilometragem">Quilometragem</label>
+                    <input type="text" id="quilometragem" name="quilometragem">
+                </div>
+                <div class="form-group">
+                    <label for="valor">Valor</label>
+                    <input type="text" id="valor" name="valor" placeholder="R$ 0,00">
+                </div>
+                <div class="form-group">
+                    <label for="vencimento">Vencimento</label>
+                    <input type="date" id="vencimento" name="vencimento">
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="button">Salvar</button>
+                    <button type="button" id="closeModal" class="buttonCancel">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Barra de pesquisa -->
+<input type="text" id="search" placeholder="Pesquisar trocas de óleo..." class="search-bar">
+<hr>
+
+<!-- Lista de trocas de óleo -->
+<table id="trocasTable" class="table">
+    <tr>
+        <th>Data</th>
+        <th>Cliente</th>
+        <th>Placa</th>
+        <th>Quilometragem</th>
+        <th>Valor</th>
+        <th>Vencimento</th>
+        <th>Status</th>
+        <th>Ações</th>
+    </tr>
+    {% for troca in trocas %}
+    {% set data_vencimento = datetime.strptime(troca[6], '%Y-%m-%d').date() %}
+    {% set dias_restantes = (data_vencimento - today.date()).days %}
+    <tr>
+        <td>{{ troca[1] }}</td>
+        <td>{{ troca[2] }}</td>
+        <td>{{ troca[3] }}</td>
+        <td>{{ troca[4] }}</td>
+        <td>{{ troca[5] | float | format_currency }}</td>
+        <td>{{ troca[6] }}</td>
+        <td>
+            {% if dias_restantes == 0 %}
+                <span class="status-red">Vence hoje!</span>
+            {% elif dias_restantes == 1 %}
+                <span class="status-orange">Vence amanhã!</span>
+            {% elif dias_restantes > 1 %}
+                <span class="status-green">Vence em {{ dias_restantes }} dias</span>
+            {% else %}
+                <span class="status-gray">Venceu</span>
+            {% endif %}
+        </td>
+        <td>
+            <a href="javascript:void(0);" class="action-btn edit-btn" onclick="editTroca({{ troca[0] }})">Editar</a>
+            <a href="javascript:void(0);" class="action-btn delete-btn" onclick="confirmDelete({{ troca[0] }})">Excluir</a>            
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    // Abrir e fechar modal
+    const modal = document.getElementById("modal-troca-oleo");
+    const btnLancarTroca = document.getElementById("btnLancarTroca");
+    const closeModal = document.getElementById("closeModal");
+
+    btnLancarTroca.onclick = function() {
+        document.getElementById("trocaForm").reset();
+        document.getElementById("modalTitle").innerText = "Lançar Troca de Óleo";
+        modal.style.display = "flex";
+    }
+
+    closeModal.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    // Função para exibir modal de confirmação para exclusão
+    function confirmDelete(id) {
+        Swal.fire({
+            title: 'Tem certeza que deseja excluir?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sim, excluir',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = `/deletar_troca/${id}`;
+            }
+        });
+    }
+
+    // Função para editar troca
+    function editTroca(id) {
+        fetch(`/troca/${id}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Erro ao carregar troca:', data.error);
+                    return;
+                }
+                document.getElementById("troca_id").value = data.id;
+                document.getElementById("data").value = data.data;
+                document.getElementById("cliente_id").value = data.cliente_id;
+                document.getElementById("quilometragem").value = data.quilometragem;
+                document.getElementById("valor").value = parseFloat(data.valor).toLocaleString('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL'
+                });
+                document.getElementById("vencimento").value = data.vencimento;
+                document.getElementById("modalTitle").innerText = "Editar Troca de Óleo";
+                modal.style.display = "flex";
+            })
+            .catch(error => console.error('Erro ao carregar troca para edição:', error));
+    }
+
+    // Formata o valor do campo "Valor" em moeda BRL com separador de milhares e vírgula para decimais
+    const valorInput = document.getElementById('valor');
+    valorInput.addEventListener('input', function () {
+        let value = valorInput.value.replace(/\D/g, '');
+        value = (parseInt(value, 10) / 100).toLocaleString('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        });
+        valorInput.value = value;
+    });
+
+    // Filtro de pesquisa em tempo real
+    document.getElementById('search').addEventListener('input', function() {
+        let searchValue = this.value.toLowerCase();
+        let rows = document.querySelectorAll('#trocasTable tr');
+
+        rows.forEach((row, index) => {
+            if (index === 0) return;
+            let cells = row.querySelectorAll('td');
+            let match = false;
+            cells.forEach(cell => {
+                if (cell.innerText.toLowerCase().includes(searchValue)) {
+                    match = true;
+                }
+            });
+            row.style.display = match ? '' : 'none';
+        });
+    });
+</script>
+{% endblock %}

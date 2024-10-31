@@ -1,0 +1,92 @@
+{% extends "base.html" %} 
+
+{% block content %}
+<hr>
+<br>
+
+<!-- Gráfico de Rosca -->
+<div class="chart-container">
+    <div class="chart">
+        <canvas id="totalizadorChart"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script>
+    const totalizadorCtx = document.getElementById('totalizadorChart').getContext('2d');
+    const totalizadorChart = new Chart(totalizadorCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['No Prazo', 'Vence Hoje', 'Vencidos'],
+            datasets: [{
+                label: 'Status de Trocas',
+                data: [{{ no_prazo | default(0) }}, {{ vence_hoje | default(0) }}, {{ vencidos | default(0) }}],
+                backgroundColor: ['#4CAF50', '#FF2756FF', '#636363FF'],  // Verde para No Prazo, Vermelho para Vence Hoje, Cinza para Vencidos
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            cutout: '70%',
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.raw;
+                            return `${label}: ${value}`;
+                        }
+                    }
+                },
+                centerText: {
+                    display: true,
+                    title: 'Total de ganho',
+                    text: '{{ total_ganho }}'
+                }
+            }
+        }
+    });
+
+    // Plugin para exibir o valor total e título no centro do gráfico
+    Chart.register({
+        id: 'centerText',
+        beforeDraw: function(chart) {
+            if (chart.config.options.plugins.centerText.display !== false) {
+                const width = chart.width,
+                      height = chart.height,
+                      ctx = chart.ctx;
+                ctx.restore();
+
+                // Configurações para o texto do título (ex.: "Total de ganho")
+                const titleFontSize = (height / 500).toFixed(2);
+                ctx.font = titleFontSize + "em sans-serif";
+                ctx.textBaseline = "middle";
+                ctx.fillStyle = '#666';  // Cor do título
+
+                const title = chart.config.options.plugins.centerText.title,
+                      titleX = Math.round((width - ctx.measureText(title).width) / 2),
+                      titleY = height / 2.2 - 10; // Ajuste a posição acima do valor
+
+                ctx.fillText(title, titleX, titleY);
+
+                // Configurações para o texto do valor (ex.: "R$ 10.000,00")
+                const valueFontSize = (height / 250).toFixed(2);
+                ctx.font = valueFontSize + "em sans-serif";
+                ctx.fillStyle = '#000';  // Cor do valor
+
+                const text = chart.config.options.plugins.centerText.text,
+                      textX = Math.round((width - ctx.measureText(text).width) / 2),
+                      textY = height / 2 + 10; // Ajuste a posição abaixo do título
+
+                ctx.fillText(text, textX, textY);
+                ctx.save();
+            }
+        }
+    });
+</script>
+
+{% endblock %}

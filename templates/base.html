@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ url_for('static', filename='img/icone.jpeg') }}" type="image/jpeg">
+    <title>Controle de Trocas de Óleo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- Menu Lateral -->
+<div class="sidebar">
+    <a href="{{ url_for('dashboard') }}"><i class='bx bx-bar-chart'></i>Dashboard</a>
+    <a href="{{ url_for('clientes') }}"><i class='bx bx-list-ul'></i>Clientes</a>
+    <a href="{{ url_for('troca_oleo') }}"><i class='bx bx-wrench'></i>Troca de Óleo</a>
+
+</div>
+
+<div class="main-content">
+    <header>
+        <h1>Controle de Trocas de Óleo</h1>
+    </header>
+    
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+</div>
+
+<script>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sucesso',
+                    text: '{{ message }}',
+                    timer: 1000,
+                    timerProgressBar: true,
+                    showConfirmButton: false
+                });
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</script>
+
+</body>
+</html>

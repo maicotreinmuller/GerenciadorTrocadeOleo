@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block content %}
+<hr>
+<br>
+<!-- Botão para abrir o modal de cadastro de cliente -->
+<button id="btnNovoCliente" class="button">+ Novo Cliente</button>
+
+<!-- Modal de cadastro e edição de cliente -->
+<div id="clienteModal" class="modal">
+    <div class="modal-content">
+        <h3 id="modalTitle">Cadastrar Cliente</h3>
+        <form method="post" action="{{ url_for('clientes') }}" id="clienteForm">
+            <input type="hidden" id="cliente_id" name="cliente_id">
+            <div class="form-group">
+                <label for="nome">Nome Completo:</label>
+                <input type="text" id="nome" name="nome" required>
+            </div>
+            <div class="form-group">
+                <label for="telefone">Telefone:</label>
+                <input type="text" id="telefone" name="telefone" required>
+            </div>
+            <div class="form-group">
+                <label for="placa">Placa Veículo:</label>
+                <input type="text" id="placa" name="placa" required>
+            </div>
+            <div class="form-group">
+                <label for="marca">Marca Veículo:</label>
+                <input type="text" id="marca" name="marca" required>
+            </div>
+            <div class="form-group">
+                <label for="modelo">Modelo Veículo:</label>
+                <input type="text" id="modelo" name="modelo" required>
+            </div>
+            <div class="form-group">
+                <label for="ano">Ano Veículo:</label>
+                <input type="text" id="ano" name="ano" required>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="button">Salvar</button>
+                <button type="button" id="closeModalFooter" class="buttonCancel">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Barra de pesquisa -->
+<input type="text" id="search" placeholder="Pesquisar clientes..." class="search-bar">
+
+<hr>
+
+<!-- Lista de clientes -->
+<table id="clientesTable" class="table">
+    <tr>
+        <th>Nome</th>
+        <th>Telefone</th>
+        <th>Placa</th>
+        <th>Marca</th>
+        <th>Modelo</th>
+        <th>Ano</th>
+        <th>Ações</th>
+    </tr>
+    {% for cliente in clientes %}
+    <tr>
+        <td>{{ cliente[1] }}</td>
+        <td>{{ cliente[2] }}</td>
+        <td>{{ cliente[3] }}</td>
+        <td>{{ cliente[4] }}</td>
+        <td>{{ cliente[5] }}</td>
+        <td>{{ cliente[6] }}</td>
+        <td>
+            <a href="javascript:void(0);" class="edit-btn" onclick="editCliente({{ cliente[0] }})">Editar</a>
+            <a href="javascript:void(0);" class="delete-btn" onclick="confirmDeleteCliente({{ cliente[0] }})">Excluir</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    const modal = document.getElementById("clienteModal");
+    const btnNovoCliente = document.getElementById("btnNovoCliente");
+    const closeModalFooter = document.getElementById("closeModalFooter");
+
+    // Abrir modal ao clicar no botão "Novo Cliente"
+    btnNovoCliente.onclick = function() {
+        document.getElementById("clienteForm").reset();
+        document.getElementById("modalTitle").innerText = "Cadastrar Cliente";
+        document.getElementById("cliente_id").value = ""; // Limpa o campo cliente_id para um novo cadastro
+        modal.style.display = "flex";
+    }
+
+    // Fechar modal ao clicar no botão "Cancelar"
+    closeModalFooter.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    // Fechar modal ao clicar fora dele
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    // Função para preencher dados do cliente no modal para edição
+    function editCliente(id) {
+        fetch(`/cliente/${id}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("cliente_id").value = data.id;
+                document.getElementById("nome").value = data.nome;
+                document.getElementById("telefone").value = data.telefone;
+                document.getElementById("placa").value = data.placa;
+                document.getElementById("marca").value = data.marca;
+                document.getElementById("modelo").value = data.modelo;
+                document.getElementById("ano").value = data.ano;
+                document.getElementById("modalTitle").innerText = "Editar Cliente";
+                modal.style.display = "flex";
+            })
+            .catch(error => console.error('Erro ao editar cliente:', error));
+    }
+
+    // Função para confirmar exclusão com modal SweetAlert2
+    function confirmDeleteCliente(id) {
+        Swal.fire({
+            title: 'Tem certeza que deseja excluir este cliente?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sim, excluir',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = `/deletar_cliente/${id}`;
+            }
+        });
+    }
+
+    // Filtro de pesquisa em tempo real
+    document.getElementById('search').addEventListener('input', function() {
+        let searchValue = this.value.toLowerCase();
+        let rows = document.querySelectorAll('#clientesTable tr');
+
+        rows.forEach((row, index) => {
+            if (index === 0) return; // Ignorar o cabeçalho
+            let cells = row.querySelectorAll('td');
+            let match = false;
+            cells.forEach(cell => {
+                if (cell.innerText.toLowerCase().includes(searchValue)) {
+                    match = true;
+                }
+            });
+            row.style.display = match ? '' : 'none';
+        });
+    });
+
+    // Adiciona máscara de telefone ao campo de telefone
+    const telefoneInput = document.getElementById('telefone');
+    telefoneInput.addEventListener('input', function (event) {
+        let value = event.target.value.replace(/\D/g, ''); // Remove caracteres não numéricos
+        if (value.length > 11) value = value.slice(0, 11); // Limita a 11 caracteres (DDD + número)
+        
+        // Formato para telefones (XX) XXXXX-XXXX ou (XX) XXXX-XXXX
+        if (value.length > 10) {
+            value = value.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
+        } else {
+            value = value.replace(/^(\d{2})(\d{4})(\d{0,4})$/, '($1) $2-$3');
+        }
+        
+        event.target.value = value; // Atualiza o campo com a máscara aplicada
+    });
+</script>
+{% endblock %}

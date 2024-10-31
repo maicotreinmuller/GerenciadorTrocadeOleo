@@ -1,0 +1,329 @@
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Configuração geral */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+header {
+    background-color: #f5f5f5;
+    padding: 1em;
+    color: #333;
+    text-align: center;
+}
+
+/* Menu Lateral */
+.sidebar {
+    width: 250px;
+    position: fixed;
+    height: 100%;
+    background-color: #1f1f1f;
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+
+.sidebar a {
+    padding: 15px;
+    text-align: left;
+    text-decoration: none;
+    font-size: 18px;
+    color: #f1f1f1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: 0.3s;
+}
+
+.sidebar a:hover {
+    background-color: #444;
+}
+
+.main-content {
+    margin-left: 260px;
+    padding: 20px;
+}
+
+/* Botões e Modais */
+button {
+    background-color: #000000;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: 0.3s;
+    width: 100%;
+}
+
+button:hover {
+    background-color: #333;
+}
+
+.buttonCancel {
+    background-color: #f44336; 
+    color: white; 
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: 0.3s;
+    width: 100%;
+}
+
+.buttonCancel:hover {
+    background-color: #d32f2f;
+}
+
+/* Modais */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    padding-top: 80px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Fundo escuro mais opaco */
+    overflow: auto;
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: auto;
+    padding: 25px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.modal-header h2 {
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.close {
+    font-size: 1.8rem;
+    color: #888;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close:hover {
+    color: #555;
+}
+
+/* Formulários nos Modais */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group input[type="number"],
+.form-group select {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="date"]:focus,
+.form-group input[type="number"]:focus,
+.form-group select:focus {
+    border-color: #1f1f1f;
+    outline: none;
+}
+
+/* Botões de ação nos formulários */
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.modal-footer .button {
+    background-color: #1f1f1f;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.modal-footer .button:hover {
+    background-color: #333;
+}
+
+/* Botão de cancelar com estilo alternativo */
+.modal-footer .button.cancel {
+    background-color: #f5f5f5;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+.modal-footer .button.cancel:hover {
+    background-color: #ddd;
+}
+
+/* Barra de Pesquisa */
+.search-bar {
+    width: 100%;
+    padding: 12px;
+    margin: 20px 0;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+/* Tabelas e Status */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+    font-size: 14px;
+}
+
+th {
+    background-color: #1f1f1f;
+    color: white;
+}
+
+.status-green {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.status-orange {
+    color: #dc7835;
+    font-weight: bold;
+}
+
+.status-red {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.status-gray {
+    color: #6c757d;
+    font-weight: bold;
+}
+
+.dashboard-indicators {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+.indicator {
+    text-align: center;
+    padding: 15px;
+    border-radius: 8px;
+    color: #ffffff;
+    width: 20%;
+    font-size: 1.1rem;
+}
+
+.indicator.vendas {
+    background-color: #4B8CF0;
+}
+
+.indicator.trocas {
+    background-color: #34A853;
+}
+
+.indicator.vencer {
+    background-color: #FFB300;
+}
+
+.indicator.vencidos {
+    background-color: #E53935;
+}
+
+.chart-container {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.chart {
+    width: 45%;
+    margin: 15px;
+}
+
+/* Estilo geral para os botões */
+.edit-btn, .delete-btn {
+    display: inline-block;
+    padding: 5px 10px;
+    margin: 0 5px;
+    text-decoration: none;
+    font-size: 14px;
+    color: #fff;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+
+/* Botão Editar - cor primária */
+.edit-btn {
+    background-color: #4CAF50; /* Verde */
+}
+
+.edit-btn:hover {
+    background-color: #45a049; /* Tom mais escuro para hover */
+}
+
+/* Botão Excluir - cor de alerta */
+.delete-btn {
+    background-color: #f44336; /* Vermelho */
+}
+
+.delete-btn:hover {
+    background-color: #d32f2f; /* Tom mais escuro para hover */
+}
