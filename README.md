@@ -26,7 +26,7 @@ Este projeto é uma aplicação web para gerenciar trocas de óleo, clientes e v
 
 1. Clone o repositório:
     ```bash
-    git clone  git clone https://github.com/maicotreinmuller/GerenciadorTrocadeOleo.git
+    git clone https://github.com/maicotreinmuller/GerenciadorTrocadeOleo.git
     ```
 
 2. Inicie o servidor:
